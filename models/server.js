@@ -1,22 +1,28 @@
-import express from "express";
+import express, { urlencoded } from "express";
 import cors from "cors"
 import conn from "../database/dbConnection.js"
+import authRouter from "../routes/auth.routes.js";
+import cookieParser from "cookie-parser"
 
 class Server {
 
     constructor() {
         this.app = express();
         this.port = process.env.PORT;
-        this.path = '/inmobil/';
+        this.path = '/api/v1';
         this.middleware();
         this.database();
+        this.routers();
     }
-
 
     middleware() {
         this.app.use(express.static('public'));
         this.app.use(express.json());
         this.app.use(cors());
+        this.app.use(express.urlencoded({
+            extended : false
+        }));
+        this.app.use(cookieParser());
     }
 
     async database() {
@@ -30,9 +36,13 @@ class Server {
             );
     }
 
+    routers(){
+        this.app.use(this.path,authRouter)
+    }
+
     listen() {
-        this.app.listen(process.env.PORT, () => {
-            console.log('Servidor corriendo con exito');
+        this.app.listen(this.port, () => {
+            console.log('Servidor corriendo con exito', this.port);
         })
     }
 
