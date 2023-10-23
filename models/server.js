@@ -1,15 +1,16 @@
 import express, { urlencoded } from "express";
 import cors from "cors"
+import cookieParser from "cookie-parser"
 import conn from "../database/dbConnection.js"
 import authRouter from "../routes/auth.routes.js";
-import cookieParser from "cookie-parser"
 
-class Server {
+
+export class Server {
 
     constructor() {
         this.app = express();
         this.port = process.env.PORT;
-        this.path = '/api/v1';
+        this.path = '/api';
         this.middleware();
         this.database();
         this.routers();
@@ -23,6 +24,10 @@ class Server {
             extended : false
         }));
         this.app.use(cookieParser());
+        this.app.use((req, res, next)=>{
+            res.locals.user_id
+            next();
+        })
     }
 
     async database() {
@@ -46,8 +51,4 @@ class Server {
         })
     }
 
-}
-
-export {
-    Server
 }
