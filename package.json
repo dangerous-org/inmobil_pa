@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "dev": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -20,5 +21,8 @@
     "mysql2": "^3.6.2",
     "uuid": "^9.0.1",
     "zod": "^3.22.4"
+},
+  "devDependencies": {
+    "nodemon": "^3.0.1"
   }
 }
