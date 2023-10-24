@@ -3,6 +3,7 @@ import cors from "cors"
 import cookieParser from "cookie-parser"
 import conn from "../database/dbConnection.js"
 import authRouter from "../routes/auth.routes.js";
+import accountRouter from "../routes/account.routes.js";
 
 
 export class Server {
@@ -24,10 +25,6 @@ export class Server {
             extended : false
         }));
         this.app.use(cookieParser());
-        this.app.use((req, res, next)=>{
-            res.locals.user_id
-            next();
-        })
     }
 
     async database() {
@@ -43,6 +40,7 @@ export class Server {
 
     routers(){
         this.app.use(this.path,authRouter)
+        this.app.use(this.path, accountRouter)
     }
 
     listen() {
