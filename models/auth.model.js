@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import conn from "../database/dbConnection.js";
 import generateJWT from "../tools/generate-jwt.js";
 
-class UserModel {
+class authModel {
   constructor() {}
 
   static async signup(req = request, res = response) {
@@ -25,7 +25,7 @@ class UserModel {
       const passCrypted = await bcrypt.hash(password, 10); // encriptar contraseña con bcrypt
 
       // Mandar query a la base de datos
-      const result = await conn.query(
+      const userCreated = await conn.query(
         "insert into users (user_id,user,password,email) values(?,?,?,?);",
         [user_id, user, passCrypted, email]
       );
@@ -56,7 +56,6 @@ class UserModel {
       } // en caso de que no se encuentre el usuario se enviara un error 404
 
       const passCrypted = userFound[0].password;
-      res.locals.user_id = userFound[0].user_id;
 
       // Si el usuario es encontrado se compararan la contraseña y la contraseña encriptada
       const isMatch = await bcrypt.compare(password, passCrypted);
@@ -80,4 +79,4 @@ class UserModel {
   }
 }
 
-export default UserModel;
+export default authModel;
