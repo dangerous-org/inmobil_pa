@@ -22,12 +22,12 @@ class authModel {
       }
 
       const user_id = v4(); //id autogenerado
-      const passCrypted = await bcrypt.hash(password, 10); // encriptar contraseña con bcrypt
+      const passwordCrypted = await bcrypt.hash(password, 10); // encriptar contraseña con bcrypt
 
       // Mandar query a la base de datos
       const userCreated = await conn.query(
         "insert into users (user_id,user,password,email) values(?,?,?,?);",
-        [user_id, user, passCrypted, email]
+        [user_id, user, passwordCrypted, email]
       );
       // si la peticion se cumple correctamente retorna un codigo de estado 200
       return res
@@ -55,10 +55,10 @@ class authModel {
         return res.status(404).json({ error: "User doesn't exists" });
       } // en caso de que no se encuentre el usuario se enviara un error 404
 
-      const passCrypted = userFound[0].password;
+      const passwordCrypted = userFound[0].password;
 
       // Si el usuario es encontrado se compararan la contraseña y la contraseña encriptada
-      const isMatch = await bcrypt.compare(password, passCrypted);
+      const isMatch = await bcrypt.compare(password, passwordCrypted);
 
       if (!isMatch) {
         return res.status(500).json({ error: "incorrect password" });
@@ -75,6 +75,39 @@ class authModel {
       });
     } catch (error) {
       console.log(error, "sign in");
+    }
+  }
+
+  static async updateUser(req = request, res = response) {
+    try {
+      const { user, password, email } = req.body; // recibir datos del form
+
+      const [userFound] = await conn.query(
+        "select user, email from users where user = ? and email <> ?",
+        [user, email]
+      );
+
+      if (userFound.length > 0) {
+        return res
+          .status(401)
+          .json({ error: `an user is already using username: ${user}` });
+      }
+
+      const passwordCrypted = await bcrypt.hash(password, 10); // encriptar la contraseña
+
+      const user_id = req.user.user_id;
+
+      const userUpdated = await conn.query(
+        "update users set user = ?, password = ?, email = ? where user_id = ?",
+        [user, passwordCrypted, email, user_id]
+      ); // actualizar la info del user
+
+      return res
+        .status(201)
+        .json({ message: "user has been updated succesfully" });
+    } catch (error) {
+      console.log(error, "=>update user");
+      return res.status(500).json({ message: "user could not be updated" });
     }
   }
 }
