@@ -1,3 +1,4 @@
+-- Active: 1695088426802@@containers-us-west-165.railway.app@5604@railway
 use railway;
 
 describe natural_person;
@@ -11,3 +12,8 @@ modify column apellido_2 varchar(50);
 describe natural_person;
 
 describe companies;
+
+alter table users
+drop index user;
+
+show index from users;
