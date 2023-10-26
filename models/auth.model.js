@@ -65,7 +65,7 @@ class authModel {
       } // si no son iguales se enviara mensaje diciendo que la contraseña es incorrecta
 
       const token = await generateJWT({ user_id: userFound[0].user_id }); // se llama al metodo para generar un nuevo token
-      res.cookie("authToken", token); // se asigna el nuevo token aun cookie
+      res.cookie("authToken", token); // se asigna el nuevo token a una cookie
 
       // En caso de que pase todas las validaciones se enviara un codigo de estado 200 y su id junto el usuario
       return res.status(200).json({
