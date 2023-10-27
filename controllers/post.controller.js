@@ -1,14 +1,21 @@
 import PostModel from "../models/post.model.js"
 
-const createPost = async (req,res) => {
+export const createPost = async (req,res) => {
     await PostModel.createPost(req,res);
 }
 
-const updatePost = async (req,res) => {
+export const updatePost = async (req,res) => {
     await PostModel.updatePost(req,res);
 }
 
-export {
-    createPost,
-    updatePost
+export const deletePost = async (req,res) => {
+    await PostModel.deletePost(req,res);
+}
+
+export const getPosts = async(req,res) => {
+    await PostModel.getPosts(req,res);
+}
+
+export const getPost = async(req,res) => {
+    await PostModel.getPost(req,res);
 }
