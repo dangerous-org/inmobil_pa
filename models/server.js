@@ -26,6 +26,11 @@ export class Server {
             extended : false
         }));
         this.app.use(cookieParser());
+        this.app.use();
+        this.app.use(fileUpload({
+            useTempFiles : true,
+            tempFileDir : '/tmp/'
+        }));
     }
 
     async database() {
