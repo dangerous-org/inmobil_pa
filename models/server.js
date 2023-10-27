@@ -1,6 +1,7 @@
 import express, { urlencoded } from "express";
 import cors from "cors"
 import cookieParser from "cookie-parser"
+import fileUpload from "express-fileupload";
 import conn from "../database/dbConnection.js"
 import authRouter from "../routes/auth.routes.js";
 import accountRouter from "../routes/account.routes.js";
@@ -26,10 +27,9 @@ export class Server {
             extended : false
         }));
         this.app.use(cookieParser());
-        this.app.use();
         this.app.use(fileUpload({
             useTempFiles : true,
-            tempFileDir : '/tmp/'
+            tempFileDir : './uploads'
         }));
     }
 

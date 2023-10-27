@@ -1,6 +1,7 @@
 import { request, response } from "express";
 import conn from "../database/dbConnection.js";
 import { v4 } from "uuid";
+import { uploadPicture } from "../tools/cloudinary.js";
 
 class PostModel {
     constructor() {
@@ -11,25 +12,35 @@ class PostModel {
         try {
             const { description, location, precio } = req.body;
 
+            
             const post_id = v4();
-
+            
             const {user_id} = req.user;
-
+            
             if (!user_id) {
                 return res.status(400).json({
                     message: 'Not authorized'
                 });
             }//Verifica si el usuario ya inicio sesion
-
+            
             await conn.query("insert into posts(post_id,description,location,precio,user_id) values(?,?,?,?,?)",
-                [
-                    post_id,
-                    description,
-                    location,
-                    precio,
-                    user_id
-                ]); // Realiza la insercion en la tabla posts
-
+            [
+                post_id,
+                description,
+                location,
+                precio,
+                user_id
+            ]); // Realiza la insercion en la tabla posts
+            
+            for (const clave in req.files) {
+                  const picture = req.files[clave];
+                  const {secure_url,public_id} = await uploadPicture(picture.tempFilePath);
+                  await conn.query(`insert into pictures set 
+                  pic_id = ?, 
+                  url = ?, 
+                  post_id = ?;`,[public_id,secure_url,post_id]);
+              }
+              
             return res.status(201).json({
                 message: 'Post has been created sucessfully'
             });
