@@ -2,6 +2,7 @@ import { request, response } from "express";
 import conn from "../database/dbConnection.js";
 import { v4 } from "uuid";
 import { uploadPicture } from "../tools/cloudinary.js";
+import fs from 'fs-extra';
 
 class PostModel {
     constructor() {
@@ -33,14 +34,15 @@ class PostModel {
             ]); // Realiza la insercion en la tabla posts
             
             for (const clave in req.files) {
-                  const picture = req.files[clave];
-                  const {secure_url,public_id} = await uploadPicture(picture.tempFilePath);
+                  const {tempFilePath} = req.files[clave];
+                  const {secure_url,public_id} = await uploadPicture(tempFilePath);
                   await conn.query(`insert into pictures set 
                   pic_id = ?, 
                   url = ?, 
                   post_id = ?;`,[public_id,secure_url,post_id]);
+                  fs.unlink(tempFilePath);
               }
-              
+
             return res.status(201).json({
                 message: 'Post has been created sucessfully'
             });
@@ -82,6 +84,8 @@ class PostModel {
         }
     }
 }
+
+
 
 
 export default PostModel;
