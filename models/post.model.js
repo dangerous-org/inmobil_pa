@@ -108,8 +108,7 @@ class PostModel {
     }
     static async updatePost(req = request, res = response) {
         try {
-            const { description, location, precio } = req.body;
-            const { post_id } = req.params;
+            const { description, location, precio, post_id } = req.body;
             const { user_id } = req.user;
 
             if (!user_id) {
@@ -149,7 +148,7 @@ class PostModel {
 
     static async deletePost(req = request, res = response) {
         try {
-            const { post_id } = req.params;
+            const { post_id } = req.body;
             const { user_id } = req.user;
 
             if (!user_id) {
@@ -161,15 +160,9 @@ class PostModel {
             const [postFind] = await conn.query(`select * from posts where post_id = ?`,
                 [post_id]);
 
-            if (postFind.length < 1) {
-                return res.status(400).json({
-                    message : `This post isn't exist`
-                })
-            }
-
             if (postFind[0].post_state == false) {
                 return res.status(400).json({
-                    message: `This post has been already deleted`
+                    message: `This post isn't exist or has been already deleted`
                 })
             }// verifica si el post existe
 
