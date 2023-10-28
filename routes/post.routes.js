@@ -12,13 +12,13 @@ validateSchema(postSchema),
 createPost
 ); // crear post
 
-postRouter.post('/update-post',
+postRouter.put('/update-post',
 validateAuth,
 validateSchema(postSchema),
 updatePost
 ); // actualizar post
 
-postRouter.post('/delete-post',
+postRouter.delete('/delete-post',
 validateAuth,
 deletePost); // eliminar post
 
