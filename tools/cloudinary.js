@@ -8,6 +8,6 @@ cloudinary.config({
 
 export const uploadPicture = async(path) => {
    return await cloudinary.uploader.upload(path,{
-    folder : 'inmobil'
+    folder : 'inmobil',
    });
 }
