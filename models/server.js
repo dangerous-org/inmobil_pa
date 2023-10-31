@@ -6,6 +6,7 @@ import conn from "../database/dbConnection.js"
 import authRouter from "../routes/auth.routes.js";
 import accountRouter from "../routes/account.routes.js";
 import postRouter from "../routes/post.routes.js"
+import profileRouter from "../routes/profiles.routes.js";
 
 
 export class Server {
@@ -45,9 +46,10 @@ export class Server {
     }
 
     routers(){
-        this.app.use(this.path, authRouter)
-        this.app.use(this.path, accountRouter)
-        this.app.use(this.path, postRouter)
+        this.app.use(this.path, authRouter);
+        this.app.use(this.path, accountRouter);
+        this.app.use(this.path, postRouter);
+        this.app.use(this.path, profileRouter);
     }
 
     listen() {

@@ -18,7 +18,6 @@ class PostModel {
                 posts
             });
 
-
         } catch (err) {
             console.log(err, `=> server has failed`);
             return res.status(500).json({
