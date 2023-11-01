@@ -19,3 +19,7 @@ export const getPosts = async(req,res) => {
 export const getPost = async(req,res) => {
     await PostModel.getPost(req,res);
 }
+
+export const searchByType = async(req,res) => {
+    await PostModel.searchByType(req,res);
+}

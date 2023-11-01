@@ -63,7 +63,7 @@ class PostModel {
 
     static async createPost(req = request, res = response) {
         try {
-            const { description, location, precio } = req.body;
+            const { description, location, precio,type } = req.body;
 
 
             const post_id = v4();
@@ -76,12 +76,13 @@ class PostModel {
                 });
             }//Verifica si el usuario ya inicio sesion
 
-            await conn.query("insert into posts(post_id,description,location,precio,user_id) values(?,?,?,?,?)",
+            await conn.query("insert into posts(post_id,description,location,precio,type,user_id) values(?,?,?,?,?,?)",
                 [
                     post_id,
                     description,
                     location,
                     precio,
+                    type,
                     user_id
                 ]); // Realiza la insercion en la tabla posts
 
@@ -107,7 +108,7 @@ class PostModel {
     }
     static async updatePost(req = request, res = response) {
         try {
-            const { description, location, precio } = req.body;
+            const { description, location, precio,type } = req.body;
             const { post_id } = req.params;
             const { user_id } = req.user;
 
@@ -130,9 +131,10 @@ class PostModel {
             description = ?,
             location = ?,
             precio = ?,
-            post_date = now()
+            post_date = now(),
+            type = ?
             where post_id = ?
-            `, [description, location, precio, post_id]); //realiza la actualizacion usando en el id del post
+            `, [description, location, precio,type,post_id]); //realiza la actualizacion usando en el id del post
 
             return res.status(201).json({
                 message: 'Update has been successfully'
@@ -190,6 +192,24 @@ class PostModel {
             return res.status(500).json({
                 message: 'Server failed, an error has ocurred'
             });
+        }
+    }
+
+    static async searchByType(req,res){
+        try{
+            const {type} = req.body;
+            if(!type){
+                return res.status(400).json({
+                    message : 'No type has been selected yet'
+                });
+            }
+            const [postFind] = await conn.query('Select * from posts where type = ?',[type]);
+
+            return res.status(200).json({
+                postFind
+            })
+        }catch(err){
+
         }
     }
 }
