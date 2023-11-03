@@ -51,7 +51,7 @@ class companyModel {
       //     .json({ message: `a company is already using the NIT: ${nit}` });
       // }
 
-      const user_id = req.user.user_id;
+      const {user_id} = req.user;
 
       const companyUpdated = await conn.query(
         "update companies set nit = ?, nombre = ?, codigo_postal = ?, direccion = ? where user_id = ?",
