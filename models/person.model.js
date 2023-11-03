@@ -72,8 +72,7 @@ class personModel {
         departamento,
       } = req.body; // obtener datos del form
 
-      const user_id = req.user.user_id;
-      console.log(user_id);
+      const {user_id} = req.user;
       const query =
         "update natural_person set dni = ?, nombre = ?, apellido_1 = ?, apellido_2 = ?, edad = ?, pais = ?, direccion = ?, ciudad = ?, departamento = ? where user_id = ?";
 
