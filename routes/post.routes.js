@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPost,deletePost,getPosts,updatePost,getPost } from "../controllers/post.controller.js";
+import { createPost,deletePost,getPosts,updatePost,getPost, searchByType } from "../controllers/post.controller.js";
 import validateSchema from "../middleware/validate.schema.js";
 import validateAuth from "../middleware/validate.auth.js";
 import postSchema from "../schemas/post.schema.js";
@@ -11,6 +11,11 @@ validateAuth,
 validateSchema(postSchema),
 createPost
 ); // crear post
+
+postRouter.post('/search-type',
+searchByType
+); // buscar por tipo
+
 
 postRouter.put('/update-post/:post_id',
 validateAuth,

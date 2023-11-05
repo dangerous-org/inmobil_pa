@@ -15,3 +15,11 @@ export const logOut = (req = request, res = response)=>{
   });
   return res.status(200).json({message: "log out succesfully"});
 } // controlador para cerrar sesion
+
+export const followUser = async (req = request, res = response) => {
+    await authModel.followUser(req,res);
+}
+
+export const unfollow = async (req = request , res = response) => {
+  await authModel.unfollow(req,res);
+} 

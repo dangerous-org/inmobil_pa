@@ -48,7 +48,7 @@ class ProfileModel {
                 });
             }
 
-            const urlFoto = await uploadPicture(foto.tempFilePath)
+            const urlFoto = await uploadPicture(photo.tempFilePath)
                 .then(picture => {
                     return picture.secure_url
                 });
@@ -120,8 +120,9 @@ class ProfileModel {
             });
         }
     }
-
-    
+    static async followUser(req = request, res = response){
+        
+    }
 }
 
 export default ProfileModel
