@@ -7,7 +7,7 @@ import authRouter from "../routes/auth.routes.js";
 import accountRouter from "../routes/account.routes.js";
 import postRouter from "../routes/post.routes.js"
 import profileRouter from "../routes/profiles.routes.js";
-
+import estateRoutes from "../routes/estate.routes.js";
 
 export class Server {
 
@@ -23,7 +23,10 @@ export class Server {
     middleware() {
         this.app.use(express.static('public'));
         this.app.use(express.json());
-        this.app.use(cors());
+        this.app.use(cors({
+            origin: "http://localhost:5173",
+            credentials: true
+        }));
         this.app.use(express.urlencoded({
             extended : false
         }));
@@ -50,6 +53,7 @@ export class Server {
         this.app.use(this.path, accountRouter);
         this.app.use(this.path, postRouter);
         this.app.use(this.path, profileRouter);
+        this.app.use(this.path, estateRoutes);
     }
 
     listen() {
