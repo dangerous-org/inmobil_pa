@@ -1,7 +1,8 @@
 import { request, response } from "express";
 import conn from "../database/dbConnection.js";
 class personModel {
-  constructor() {}
+  constructor() {
+  }
   static async createPerson(req = request, res = response) {
     try {
       const {
@@ -58,7 +59,7 @@ class personModel {
     }
   } // crear / añadir info adicional al usuario de tipo persona
 
-  static async updatePersona(req = request, res = response) {
+  static async updatePerson(req = request, res = response) {
     try {
       const {
         dni,

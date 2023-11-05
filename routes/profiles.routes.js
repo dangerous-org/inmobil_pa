@@ -29,5 +29,4 @@ profileRouter.put('/update-biography',
 validateAuth,
 putBiography);
 
-
 export default profileRouter;

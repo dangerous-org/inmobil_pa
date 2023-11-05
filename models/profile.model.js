@@ -120,6 +120,9 @@ class ProfileModel {
             });
         }
     }
+    static async followUser(req = request, res = response){
+        
+    }
 }
 
 export default ProfileModel

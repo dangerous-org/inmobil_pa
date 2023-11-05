@@ -34,24 +34,17 @@ class PostModel {
                     message: 'post_id is required'
                 })
             }
-            const [post] = await conn.query(`
-            select * 
-            from(
-            select * 
-            from posts
-            where post_id = ?
-            )as posts 
-            where post_state = ?;`,
-                [post_id,true]);
+            const [post] = await conn.query(`call getPostById(?)`,
+                [post_id]);
 
-            if (post.length < 1) {
+            if (post[0].length < 1) {
                 return res.status(200).json({
                     message: `This post isn't exist`
                 })
             }
 
             return res.status(200).json({
-                post
+                post : post[0]
             });
         } catch (err) {
             console.log(err, `=> server has failed`);
