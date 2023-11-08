@@ -26,7 +26,7 @@ class PostModel {
 
     static async getPost(req = request, res = response) {
         try {
-            const { post_id } = req.body;
+            const { post_id } = req.params;
             if (!post_id) {
                 return res.status(400).json({
                     message: 'post_id is required'
@@ -61,6 +61,7 @@ class PostModel {
 
       const { user_id } = req.user;
 
+      console.log( req.files);
       if (!user_id) {
         return res.status(400).json({
           message: "Not authorized",

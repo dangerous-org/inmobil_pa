@@ -30,6 +30,6 @@ deletePost); // eliminar post
 postRouter.get('/get-posts',
 getPosts); // Obtener todos los post
 
-postRouter.get('/get-post',
+postRouter.get('/get-post/:post_id',
 getPost); // Obtener un post mediante su id
 export default postRouter;
