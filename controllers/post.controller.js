@@ -23,3 +23,7 @@ export const getPost = async(req,res) => {
 export const searchByType = async(req,res) => {
     await PostModel.searchByType(req,res);
 }
+
+export const getPics = async(req,res) => {
+    await PostModel.getPics(req,res);
+}
