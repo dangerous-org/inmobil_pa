@@ -42,7 +42,7 @@ class PostModel {
             }
 
             return res.status(200).json({
-                post : post[0]
+                post : post[0][0]
             });
         } catch (err) {
             console.log(err, `=> server has failed`);
@@ -52,10 +52,36 @@ class PostModel {
         }
     }
 
+    static async getPics(req = request, res = response){
+      try {
+        const { post_id } = req.params;
+        if (!post_id) {
+            return res.status(400).json({
+                message: 'post_id is required'
+            })
+        }
+        const [pics] = await conn.query(`call getPics(?)`,
+            [post_id]);
+
+        if (pics.length < 1) {
+            return res.status(200).json({
+                message: `pics are not uploaded`
+            })
+        }
+        return res.status(200).json({
+            pics : pics[0]
+        });
+    } catch (err) {
+        console.log(err, `=> server has failed`);
+        return res.status(500).json({
+            message: 'Server has failed, an error has ocurred'
+        })
+    }
+  }
+
     static async createPost(req = request, res = response) {
         try {
             const { description, location, precio,type } = req.body;
-
 
       const post_id = v4();
 

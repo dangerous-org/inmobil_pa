@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { createPost,deletePost,getPosts,updatePost,getPost, searchByType } from "../controllers/post.controller.js";
+import { createPost,deletePost,getPosts,updatePost,getPost, searchByType, getPics } from "../controllers/post.controller.js";
 import validateSchema from "../middleware/validate.schema.js";
 import validateAuth from "../middleware/validate.auth.js";
 import postSchema from "../schemas/post.schema.js";
@@ -31,5 +31,9 @@ postRouter.get('/get-posts',
 getPosts); // Obtener todos los post
 
 postRouter.get('/get-post/:post_id',
-getPost); // Obtener un post mediante su id
+getPost);
+// Obtener un post mediante su id
+
+postRouter.get('/get-pics/:post_id',
+getPics);//obtener las fotos
 export default postRouter;
