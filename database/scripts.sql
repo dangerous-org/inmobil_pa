@@ -6,6 +6,6 @@ describe natural_person;
 describe users;
 
 
-describe estate;
+describe users;
 
 select * from estate inner join posts on estate.post_id = posts.post_id;
