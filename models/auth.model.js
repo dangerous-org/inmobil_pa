@@ -111,6 +111,64 @@ class authModel {
       return res.status(500).json({ message: "user could not be updated" });
     }
   }
+  
+  static async followUser(req = request, res = response){
+    try {
+
+      const {followed_id} = req.params;
+      const {user_id} = req.user;
+      const [userFound] = await conn.query(`select * from users where user_id = ? `, [followed_id]);
+
+      if (userFound.length < 1) {
+        return res.status(400).json({
+          message : `User to follow isn't exist`
+        })
+      }
+
+      const [followFound] = await conn.query(`select * from following where user_id = ? AND seguido_id = ?`,[user_id,followed_id]) ;
+
+      if(followFound.length != 0){
+        return res.status(400).json({
+          message : 'You are already follow this user'
+        })
+      }
+
+      await conn.query(`insert into following values(?,?)`,[user_id,followed_id]) ;
+      return res.status(201).json({
+        message : 'Now you are following this user'
+      });
+
+    } catch (err) {
+      return res.status(500).json({
+        message : 'An error has ocurred' 
+      })
+    }
+  }
+  
+  static async unfollow(req = request, res = response){
+    try {
+
+      const {followed_id} = req.params;
+      const {user_id} = req.user;
+      const [userFound] = await conn.query(`select * from users where user_id = ? `, [followed_id]);
+
+      if (userFound.length < 1) {
+        return res.status(400).json({
+          message : `User to follow isn't exist`
+        })
+      }
+
+      await conn.query(`delete from following where user_id = ? AND seguido_id = ?`,[user_id,followed_id]) ;
+
+      return res.status(200).json({
+        message : 'you have stopped following this user'
+      });
+    } catch (err) {
+      return res.status(500).json({
+        message : 'An error has ocurred' 
+      })
+    }
+  }
 }
 
 export default authModel;

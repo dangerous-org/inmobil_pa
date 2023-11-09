@@ -10,8 +10,10 @@ const validateAuth = (req, res, next) => {
   }// verificar si exioste el token
 
   jwt.verify(authToken, process.env.SECRET_KEY, (error, user) => {
-    if (error) return res.status(403).json({ message: "unauthorized" });
-    console.log(error);
+    if (error){
+      console.log(error);
+      return res.status(403).json({ message: "unauthorized" });
+    }
     req.user = user; // asignar el valor del token a un varibale
   });
   next();
