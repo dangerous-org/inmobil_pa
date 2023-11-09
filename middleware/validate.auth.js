@@ -1,22 +1,24 @@
-import jwt from "jsonwebtoken";
+import { request, response } from "express";
+import { ZodError } from "zod";
 
-//  este middleware fue creado para veficar un token, usado para extraer la info del token
-// y a la vez para validar que se puedan o no acceder a otras rutas
-
-const validateAuth = (req, res, next) => {
-  const { authToken } = req.cookies; //  extraemos el token de las cookies (configurar el middleware "cookie-parser")
-  if (!authToken) {
-    return res.status(401).json({ message: "unauthorized" });
-  }// verificar si exioste el token
-
-  jwt.verify(authToken, process.env.SECRET_KEY, (error, user) => {
-    if (error){
-      console.log(error);
-      return res.status(403).json({ message: "unauthorized" });
+const validateSchema =
+  (
+    schema // recibir un schema en el metodo
+  ) =>
+  (req = request, res = response, next) => {
+    try {
+      schema.parse(req.body); // parsear el schema con los datos recibidos a través del form
+      next();
+    } catch (error) {
+      if (error instanceof ZodError) {
+        const errorObject = error.errors.reduce((acc, err, index) => {
+          acc[`error${index}`] = err.message;
+          return acc;
+        }, {});
+        
+        return res.status(500).json(errorObject);
+      }
     }
-    req.user = user; // asignar el valor del token a un varibale
-  });
-  next();
-};
+  };
 
-export default validateAuth;
+export default validateSchema;
