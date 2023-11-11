@@ -12,7 +12,7 @@ class PostModel {
       const [posts] = await conn.query(
         "select * from posts where post_state = ?",
         [true]
-      );
+      ); // Obtiene todos los post que esten activos
       return res.status(200).json({
         posts,
       });
@@ -30,25 +30,25 @@ class PostModel {
             if (!post_id) {
                 return res.status(400).json({
                     message: 'post_id is required'
-                })
-            }
+                });
+            } 
             const [post] = await conn.query(`call getPostById(?)`,
-                [post_id]);
+                [post_id]); // Busca en la base de datos un post que coincida con el id y obtiene toda su informacion
 
             if (post[0].length < 1) {
                 return res.status(200).json({
                     message: `This post isn't exist`
-                })
-            }
+                });
+            }// verifica si encontro algun post
 
             return res.status(200).json({
-                post : post[0][0]
-            });
+                post : post[0]
+            });// Devuelve toda la informacion relacionada al post
         } catch (err) {
             console.log(err, `=> server has failed`);
             return res.status(500).json({
                 message: 'Server has failed, an error has ocurred'
-            })
+            });
         }
     }
 
@@ -58,24 +58,24 @@ class PostModel {
         if (!post_id) {
             return res.status(400).json({
                 message: 'post_id is required'
-            })
-        }
+            });
+        } // verifica si el post existe
         const [pics] = await conn.query(`call getPics(?)`,
-            [post_id]);
+            [post_id]); // Obtiene todas las fotos cargadas para este post
 
-        if (pics.length < 1) {
+        if (pics[0].length < 1) {
             return res.status(200).json({
                 message: `pics are not uploaded`
-            })
+            }); // verifica si hay fotos cargadas para este post
         }
         return res.status(200).json({
             pics : pics[0]
-        });
+        }); // devuelve la url e id de todas las fotos
     } catch (err) {
         console.log(err, `=> server has failed`);
         return res.status(500).json({
             message: 'Server has failed, an error has ocurred'
-        })
+        });
     }
   }
 
@@ -116,7 +116,6 @@ class PostModel {
         );
         fs.unlink(tempFilePath); // elimina los archivos temporales despues de cada insercion
       }
-
             return res.status(201).json({
                 message: 'Post has been created sucessfully'
             });
@@ -240,5 +239,4 @@ class PostModel {
         }
     }
 }
-
 export default PostModel;
