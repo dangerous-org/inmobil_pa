@@ -7,15 +7,16 @@ const validateSchema =
   ) =>
   (req = request, res = response, next) => {
     try {
-      schema.parse(req.body); // parsear el schema con los datos recibidos a traves del form
+      schema.parse(req.body); // parsear el schema con los datos recibidos a través del form
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        return res.status(500).json(
-          error.issues.map((err) => {
-            return err.path + " " + err.message;
-          })
-        );
+        const errorObject = error.errors.reduce((acc, err, index) => {
+          acc[`error${index}`] = err.message;
+          return acc;
+        }, {});
+        
+        return res.status(500).json(errorObject);
       }
     }
   };
