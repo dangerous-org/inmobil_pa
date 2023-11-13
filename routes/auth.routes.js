@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { signIn, signUp, logOut, followUser, unfollow, verifyToken } from "../controllers/auth.controller.js";
+import { signIn, signUp, logOut, followUser, unfollow, verifyToken, googleVerify } from "../controllers/auth.controller.js";
 import validateSchema from "../middleware/validate.schema.js";
 import { userSchemaSignIn, userSchemaSignUp } from "../schemas/auth.schema.js";
 import validateAuth from "../middleware/validate.auth.js";
@@ -12,4 +12,5 @@ authRouter.post("/follow/:followed_id",validateAuth,followUser);
 authRouter.delete("/unfollow/:followed_id",validateAuth,unfollow);
 authRouter.post("/log-out", logOut);
 authRouter.get("/verify-token",verifyToken);
+authRouter.post("/google",googleVerify);
 export default authRouter;

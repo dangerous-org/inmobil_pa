@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import conn from "../database/dbConnection.js";
 import generateJWT from "../tools/generate-jwt.js";
+import googleVerify from "../tools/google-verify.js";
+import { logOut } from "../controllers/auth.controller.js";
 
 class authModel {
   constructor() {}
@@ -79,6 +81,27 @@ class authModel {
     }
   }
 
+  static async googleAuth(req = request, res = response) {
+    try {
+      const { id_token } = req.body;
+      const { payload } = await googleVerify(id_token);
+      const { email, nbf } = payload;
+      const user_id = v4();
+      const userCreated = await conn.query(
+        "insert into users (user_id, user, email, google_state) values(?,?,?,?) ",
+        [user_id, nbf, email, true]
+      );
+      const token = await generateJWT({ user_id });
+      res.cookie("authToken", token);
+      return res
+        .status(201)
+        .json({ message: "user has been created successfully" });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "google auth could not be done" });
+    }
+  }
+
   static async verifyToken(req = request, res = response) {
     const { authToken } = req.cookies;
     if (!authToken) return res.status(401).json({ mesaage: "unauthorized" });
@@ -94,7 +117,7 @@ class authModel {
         user_id: userFound[0].user_id,
         email: userFound[0].email,
         user: userFound[0].user,
-        createdAt: userFound[0].created_at
+        createdAt: userFound[0].created_at,
       });
     });
   }

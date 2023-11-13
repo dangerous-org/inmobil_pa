@@ -13,6 +13,10 @@ export const verifyToken = async (req = request, res = response) => {
   await authModel.verifyToken(req, res);
 };
 
+export const googleVerify = async(req, res)=>{
+  await authModel.googleAuth(req, res);
+}
+
 export const logOut = (req = request, res = response) => {
   res.cookie("authToken", "", {
     expires: new Date(0),
