@@ -11,12 +11,9 @@ const validateSchema =
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        const errorObject = error.errors.reduce((acc, err, index) => {
-          acc[`error${index}`] = err.message;
-          return acc;
-        }, {});
-        
-        return res.status(500).json(errorObject);
+        return res.status(500).json(error.errors.map((err)=>{
+          return err.message;
+        }));
       }
     }
   };
