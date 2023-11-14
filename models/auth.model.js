@@ -83,14 +83,29 @@ class authModel {
 
   static async googleAuth(req = request, res = response) {
     try {
-      const { id_token } = req.body;
-      const { payload } = await googleVerify(id_token);
+      const { authToken } = req.body;
+      const { payload } = await googleVerify(authToken);
       const { email, nbf } = payload;
+      const [userFound] = await conn.query(
+        "select * from users where email = ?",
+        [email]
+      );
+
+      if (userFound && userFound.length > 0) {
+        const user_id = userFound[0].user_id;
+        const token = await generateJWT({ user_id });
+        res.cookie("authToken", token);
+        return res
+          .status(200)
+          .json({ message: "user authenticated successfully" });
+      }
+
       const user_id = v4();
       const userCreated = await conn.query(
-        "insert into users (user_id, user, email, google_state) values(?,?,?,?) ",
+        "insert into users (user_id, user, email, google_state) values(?,?,?,?)",
         [user_id, nbf, email, true]
       );
+
       const token = await generateJWT({ user_id });
       res.cookie("authToken", token);
       return res
