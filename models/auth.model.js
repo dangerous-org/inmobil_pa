@@ -95,9 +95,11 @@ class authModel {
         const user_id = userFound[0].user_id;
         const token = await generateJWT({ user_id });
         res.cookie("authToken", token);
-        return res
-          .status(200)
-          .json({ message: "user authenticated successfully" });
+        return res.status(200).json({
+          user_id: userFound[0].user_id,
+          user: userFound[0].user,
+          email: userFound[0].email,
+        });
       }
 
       const user_id = v4();
@@ -110,7 +112,7 @@ class authModel {
       res.cookie("authToken", token);
       return res
         .status(201)
-        .json({ message: "user has been created successfully" });
+        .json({ user_id: user_id, user: nbf, email: email });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "google auth could not be done" });
