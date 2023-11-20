@@ -88,12 +88,6 @@ class PostModel {
       const { user_id } = req.user;
 
       console.log( req.files);
-      if (!user_id) {
-        return res.status(400).json({
-          message: "Not authorized",
-        });
-      } //Verifica si el usuario ya inicio sesion
-
             await conn.query("insert into posts(post_id,description,location,precio,type,user_id) values(?,?,?,?,?,?)",
                 [
                     post_id,
@@ -132,12 +126,6 @@ class PostModel {
             const { description, location, precio,type } = req.body;
             const { post_id } = req.params;
             const { user_id } = req.user;
-
-      if (!user_id) {
-        return res.status(200).json({
-          message: "Not authorized",
-        });
-      } //verifica si el usuario inicio sesion
 
       const [postFind] = await conn.query(
         `select * from posts where post_id = ?`,
