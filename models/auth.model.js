@@ -78,6 +78,7 @@ class authModel {
       });
     } catch (error) {
       console.log(error, "sign in");
+      return res.status(500).json({message: "could not sign in"})
     }
   }
 

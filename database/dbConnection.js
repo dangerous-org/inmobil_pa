@@ -7,5 +7,4 @@ const conn = mysql.createPool({
   user: "root",
   password: "AFa5h24DeCg2a-cF22gCECHAAADbgc-G",
 });
-
 export default conn;

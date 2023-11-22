@@ -3,6 +3,7 @@ import conn from "../database/dbConnection.js";
 import { v4 } from "uuid";
 import { uploadPicture } from "../tools/cloudinary.js";
 import fs from "fs-extra";
+import { log } from "console";
 
 class PostModel {
   constructor() {}
@@ -95,22 +96,36 @@ class PostModel {
         "insert into posts(post_id,description,location,price,type,user_id) values(?,?,?,?,?,?)",
         [post_id, description, location, price, type, user_id]
       ); // Realiza la insercion en la tabla posts
-      const files  = req.files;
-      for (const file of files) {
-        console.log(file);
-        const { tempFilePath } = file;
-        const { secure_url, public_id } = await uploadPicture(tempFilePath);
-        await conn.query(
-          `insert into pictures set 
+      const { files } = req.files;
+      if (Array.isArray(files)) {
+        for (const file of files) {
+          const { tempFilePath } = file;
+          const { secure_url, public_id } = await uploadPicture(tempFilePath);
+          await conn.query(
+            `insert into pictures set 
+                      pic_id = ?, 
+                      url = ?, 
+                      post_id = ?;`,
+            [public_id, secure_url, post_id]
+          );
+          console.log(tempFilePath);
+          fs.unlink(tempFilePath); // elimina los archivos temporales despues de cada insercion
+        }
+        return res.status(201).json({
+          message: "Post has been created sucessfully",
+        });
+      }
+      const { tempFilePath } = files;
+      const { secure_url, public_id } = await uploadPicture(tempFilePath);
+      await conn.query(
+        `insert into pictures set 
                   pic_id = ?, 
                   url = ?, 
                   post_id = ?;`,
-          [public_id, secure_url, post_id]
-        );
-        console.log(tempFilePath);
-        fs.unlink(tempFilePath); // elimina los archivos temporales despues de cada insercion
-      }
-
+        [public_id, secure_url, post_id]
+      );
+      console.log(tempFilePath);
+      fs.unlink(tempFilePath); // elimina los archivos temporales despues de cada insercion
       return res.status(201).json({
         message: "Post has been created sucessfully",
       });
@@ -143,7 +158,7 @@ class PostModel {
         `update posts set
             description = ?,
             location = ?,
-            precio = ?,
+            price = ?,
             post_date = now(),
             type = ?
             where post_id = ?
@@ -231,5 +246,4 @@ class PostModel {
     } catch (err) {}
   }
 }
-
 export default PostModel;
