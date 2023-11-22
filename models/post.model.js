@@ -5,7 +5,7 @@ import { uploadPicture } from "../tools/cloudinary.js";
 import fs from "fs-extra";
 
 class PostModel {
-  constructor() {}
+  constructor() { }
 
   static async getPosts(req = request, res = response) {
     try {
@@ -143,7 +143,7 @@ class PostModel {
         `update posts set
             description = ?,
             location = ?,
-            precio = ?,
+            price = ?,
             post_date = now(),
             type = ?
             where post_id = ?
@@ -231,5 +231,4 @@ class PostModel {
     } catch (err) {}
   }
 }
-
 export default PostModel;

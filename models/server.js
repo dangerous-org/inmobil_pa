@@ -8,6 +8,7 @@ import accountRouter from "../routes/account.routes.js";
 import postRouter from "../routes/post.routes.js"
 import profileRouter from "../routes/profiles.routes.js";
 import estateRoutes from "../routes/estate.routes.js";
+import  catalogueRouter  from "../routes/catalogue.routes.js";
 
 export class Server {
 
@@ -54,6 +55,7 @@ export class Server {
         this.app.use(this.path, postRouter);
         this.app.use(this.path, profileRouter);
         this.app.use(this.path, estateRoutes);
+        this.app.use(this.path, catalogueRouter);
     }
 
     listen() {
