@@ -95,9 +95,9 @@ class PostModel {
         "insert into posts(post_id,description,location,price,type,user_id) values(?,?,?,?,?,?)",
         [post_id, description, location, price, type, user_id]
       ); // Realiza la insercion en la tabla posts
-      const { files } = req.files;
-      console.log(files);
+      const files  = req.files;
       for (const file of files) {
+        console.log(file);
         const { tempFilePath } = file;
         const { secure_url, public_id } = await uploadPicture(tempFilePath);
         await conn.query(
