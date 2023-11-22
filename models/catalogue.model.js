@@ -124,11 +124,46 @@ class Catalogue {
             });
         }
     }
+
     static async addPostToCatalogue(req = request, res = response) {
         try {
-            const {} = req.params;
+            const {catalogue_id} = req.params;
+            const {post_id} = req.query;
+            if(!catalogue_id || !post_id){
+                return res.status(400).json({
+                    message : 'catalogue and post are obligatories'
+                }); 
+            }
+            const [result] = await conn.query('update posts set catalogue_id = ? where post_id = ?',
+            [catalogue_id, post_id]);
+            if(result.affectedRows < 1){
+                return res.status(200).json({
+                    message : 'post or catalogue are not exist'
+                })
+            }
+            return res.status(201).json({
+                message : 'Post has been successfully added to catalogue'
+            });
         } catch (err) {
-            
+            console.log(err, '=> server error');
+            return res.status(500).json({
+                message : 'server failed'
+            });
+        }
+    }
+
+    static async getPostsInCatalogue(req = request, res = response){
+        try {
+            const {catalogue_id} = req.params;
+            const [posts] = await conn.query("select * from posts where catalogue_id = ?",[catalogue_id]);
+            res.status(200).json({
+                posts
+            });  
+        } catch (err) {
+            console.log(err, '=> ');
+            res.status(500).json({
+                message : 'Server Failed'
+            })
         }
     }
 }

@@ -2,7 +2,7 @@ import { Router } from "express";
 import validateAuth from "../middleware/validate.auth.js"
 import validateSchema from "../middleware/validate.schema.js";
 import { catalogueSchema } from "../schemas/catalogue.schema.js";
-import {createCatalogue, deleteCatalogue, getCatalogues, getUserCatalogues, updateCatalogue, getCatalogueById} from "../controllers/catalogue.controller.js";
+import {createCatalogue, deleteCatalogue, getCatalogues, getUserCatalogues, updateCatalogue, getCatalogueById, addPostToCatalogue, getPostsInCatalogue} from "../controllers/catalogue.controller.js";
 
 const catalogueRouter = Router();
 
@@ -37,5 +37,15 @@ catalogueRouter.put('/update-catalogue/:catalogue_id',
     validateSchema(catalogueSchema),
     updateCatalogue
 );
+
+catalogueRouter.post('/add-catalogue/:catalogue_id',
+    validateAuth,
+    addPostToCatalogue
+)
+
+catalogueRouter.get('/get-postcatalogue/:catalogue_id',
+    validateAuth,
+    getPostsInCatalogue
+)
 
 export default catalogueRouter;

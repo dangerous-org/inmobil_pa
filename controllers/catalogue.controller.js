@@ -25,3 +25,11 @@ export const getUserCatalogues = async(req, res) => {
 export const getCatalogueById = async(req, res) => {
     await Catalogue.getCatalogueById(req, res);
 }
+
+export const addPostToCatalogue = async(req, res) => {
+    await Catalogue.addPostToCatalogue(req, res);
+}
+
+export const getPostsInCatalogue = async(req, res) => {
+    await Catalogue.getPostsInCatalogue(req,res);
+}

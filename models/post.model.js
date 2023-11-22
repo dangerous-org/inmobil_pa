@@ -94,7 +94,7 @@ class PostModel {
         });
       } //Verifica si el usuario ya inicio sesion
 
-      await conn.query("insert into posts(post_id,description,location,precio,type,user_id) values(?,?,?,?,?,?)",
+      await conn.query("insert into posts(post_id,description,location,price,type,user_id) values(?,?,?,?,?,?)",
         [
           post_id,
           description,
@@ -153,7 +153,7 @@ class PostModel {
         `update posts set
             description = ?,
             location = ?,
-            precio = ?,
+            price = ?,
             post_date = now(),
             type = ?
             where post_id = ?
