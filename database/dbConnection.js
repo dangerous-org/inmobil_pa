@@ -1,11 +1,10 @@
-import mysql from 'mysql2/promise'
+import mysql from "mysql2/promise";
 
 const conn = mysql.createPool({
-    host : 'containers-us-west-165.railway.app',
-    port : '5604',
-    database : 'railway',
-    user : 'root',
-    password : 'fOQBLtn2kiKNQOGkW5Iy'
+  host: "viaduct.proxy.rlwy.net",
+  port: "45390",
+  database: "railway",
+  user: "root",
+  password: "AFa5h24DeCg2a-cF22gCECHAAADbgc-G",
 });
-
-    export default conn;
+export default conn;

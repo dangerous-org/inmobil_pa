@@ -1,8 +1,11 @@
 import { v4 } from "uuid";
 import { response, request } from "express";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import conn from "../database/dbConnection.js";
 import generateJWT from "../tools/generate-jwt.js";
+import googleVerify from "../tools/google-verify.js";
+import { logOut } from "../controllers/auth.controller.js";
 
 class authModel {
   constructor() {}
@@ -52,7 +55,7 @@ class authModel {
       );
 
       if (userFound.length < 1) {
-        return res.status(404).json({ error: "User doesn't exists" });
+        return res.status(400).json({ message: "User doesn't exists" });
       } // en caso de que no se encuentre el usuario se enviara un error 404
 
       const passwordCrypted = userFound[0].password;
@@ -61,7 +64,7 @@ class authModel {
       const isMatch = await bcrypt.compare(password, passwordCrypted);
 
       if (!isMatch) {
-        return res.status(500).json({ error: "incorrect password" });
+        return res.status(400).json({ message: "incorrect password" });
       } // si no son iguales se enviara mensaje diciendo que la contraseña es incorrecta
 
       const token = await generateJWT({ user_id: userFound[0].user_id }); // se llama al metodo para generar un nuevo token
@@ -69,7 +72,7 @@ class authModel {
 
       // En caso de que pase todas las validaciones se enviara un codigo de estado 200 y su id junto el usuario
       return res.status(200).json({
-        id: userFound[0].user_id,
+        user_id: userFound[0].user_id,
         user: userFound[0].user,
         email: userFound[0].email,
       });
@@ -77,6 +80,64 @@ class authModel {
       console.log(error, "sign in");
       return res.status(500).json({message: "could not sign in"})
     }
+  }
+
+  static async googleAuth(req = request, res = response) {
+    try {
+      const { authToken } = req.body;
+      const { payload } = await googleVerify(authToken);
+      const { email, nbf } = payload;
+      const [userFound] = await conn.query(
+        "select * from users where email = ?",
+        [email]
+      );
+
+      if (userFound && userFound.length > 0) {
+        const user_id = userFound[0].user_id;
+        const token = await generateJWT({ user_id });
+        res.cookie("authToken", token);
+        return res.status(200).json({
+          user_id: userFound[0].user_id,
+          user: userFound[0].user,
+          email: userFound[0].email,
+        });
+      }
+
+      const user_id = v4();
+      const userCreated = await conn.query(
+        "insert into users (user_id, user, email, google_state) values(?,?,?,?)",
+        [user_id, nbf, email, true]
+      );
+
+      const token = await generateJWT({ user_id });
+      res.cookie("authToken", token);
+      return res
+        .status(201)
+        .json({ user_id: user_id, user: nbf, email: email });
+    } catch (error) {
+      console.log(error);
+      return res.status(500).json({ message: "google auth could not be done" });
+    }
+  }
+
+  static async verifyToken(req = request, res = response) {
+    const { authToken } = req.cookies;
+    if (!authToken) return res.status(401).json({ mesaage: "unauthorized" });
+    jwt.verify(authToken, process.env.SECRET_KEY, async (err, user) => {
+      if (err) return res.status(401).json({ messagee: "Unauthorized" });
+      const [userFound] = await conn.query(
+        "select * from users where user_id = ?",
+        [user.user_id]
+      );
+      if (!userFound) return res.status(401).json({ messagee: "Unauthorized" });
+
+      return res.json({
+        user_id: userFound[0].user_id,
+        email: userFound[0].email,
+        user: userFound[0].user,
+        createdAt: userFound[0].created_at,
+      });
+    });
   }
 
   static async updateUser(req = request, res = response) {
@@ -91,7 +152,7 @@ class authModel {
       if (userFound.length > 0) {
         return res
           .status(401)
-          .json({ error: `an user is already using username: ${user}` });
+          .json({ message: `an user is already using username: ${user}` });
       }
 
       const passwordCrypted = await bcrypt.hash(password, 10); // encriptar la contraseña
@@ -111,62 +172,74 @@ class authModel {
       return res.status(500).json({ message: "user could not be updated" });
     }
   }
-  
-  static async followUser(req = request, res = response){
-    try {
 
-      const {followed_id} = req.params;
-      const {user_id} = req.user;
-      const [userFound] = await conn.query(`select * from users where user_id = ? `, [followed_id]);
+  static async followUser(req = request, res = response) {
+    try {
+      const { followed_id } = req.params;
+      const { user_id } = req.user;
+      const [userFound] = await conn.query(
+        `select * from users where user_id = ? `,
+        [followed_id]
+      );
 
       if (userFound.length < 1) {
         return res.status(400).json({
-          message : `User to follow isn't exist`
-        })
+          message: `User to follow isn't exist`,
+        });
       }
 
-      const [followFound] = await conn.query(`select * from following where user_id = ? AND seguido_id = ?`,[user_id,followed_id]) ;
+      const [followFound] = await conn.query(
+        `select * from following where user_id = ? AND seguido_id = ?`,
+        [user_id, followed_id]
+      );
 
-      if(followFound.length != 0){
+      if (followFound.length != 0) {
         return res.status(400).json({
-          message : 'You are already follow this user'
-        })
+          message: "You are already follow this user",
+        });
       }
 
-      await conn.query(`insert into following values(?,?)`,[user_id,followed_id]) ;
+      await conn.query(`insert into following values(?,?)`, [
+        user_id,
+        followed_id,
+      ]);
       return res.status(201).json({
-        message : 'Now you are following this user'
+        message: "Now you are following this user",
       });
-
     } catch (err) {
       return res.status(500).json({
-        message : 'An error has ocurred' 
-      })
+        message: "An error has ocurred",
+      });
     }
   }
-  
-  static async unfollow(req = request, res = response){
-    try {
 
-      const {followed_id} = req.params;
-      const {user_id} = req.user;
-      const [userFound] = await conn.query(`select * from users where user_id = ? `, [followed_id]);
+  static async unfollow(req = request, res = response) {
+    try {
+      const { followed_id } = req.params;
+      const { user_id } = req.user;
+      const [userFound] = await conn.query(
+        `select * from users where user_id = ? `,
+        [followed_id]
+      );
 
       if (userFound.length < 1) {
         return res.status(400).json({
-          message : `User to follow isn't exist`
-        })
+          message: `User to follow isn't exist`,
+        });
       }
 
-      await conn.query(`delete from following where user_id = ? AND seguido_id = ?`,[user_id,followed_id]) ;
+      await conn.query(
+        `delete from following where user_id = ? AND seguido_id = ?`,
+        [user_id, followed_id]
+      );
 
       return res.status(200).json({
-        message : 'you have stopped following this user'
+        message: "you have stopped following this user",
       });
     } catch (err) {
       return res.status(500).json({
-        message : 'An error has ocurred' 
-      })
+        message: "An error has ocurred",
+      });
     }
   }
 }
