@@ -12,3 +12,6 @@ select * from estate inner join posts on estate.post_id = posts.post_id;
 
 
 select * from users;
+
+alter Table posts
+rename column precio to price;
