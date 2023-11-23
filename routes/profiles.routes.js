@@ -7,8 +7,8 @@ import { createProfile, putBanner, putBiography, putPhoto, updateProfile } from 
 const profileRouter = Router();
 
 profileRouter.post('/create-profile',
-validateSchema(profileSchema),
 validateAuth,
+validateSchema(profileSchema),
 createProfile
 );
 

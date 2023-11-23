@@ -6,6 +6,7 @@ import conn from "../database/dbConnection.js";
 import generateJWT from "../tools/generate-jwt.js";
 import googleVerify from "../tools/google-verify.js";
 import { logOut } from "../controllers/auth.controller.js";
+import { log } from "console";
 
 class authModel {
   constructor() {}
@@ -70,15 +71,21 @@ class authModel {
       const token = await generateJWT({ user_id: userFound[0].user_id }); // se llama al metodo para generar un nuevo token
       res.cookie("authToken", token); // se asigna el nuevo token a una cookie
 
-      // En caso de que pase todas las validaciones se enviara un codigo de estado 200 y su id junto el usuario
+      const [profile] = await conn.query(
+        "select * from profiles where user_id = ?",
+        [userFound[0].user_id]
+      );
       return res.status(200).json({
         user_id: userFound[0].user_id,
         user: userFound[0].user,
         email: userFound[0].email,
+        photo: profile[0].foto,
+        banner: profile[0].banner,
+        biography: profile[0].biography
       });
     } catch (error) {
       console.log(error, "sign in");
-      return res.status(500).json({message: "could not sign in"})
+      return res.status(500).json({ message: "could not sign in" });
     }
   }
 
@@ -130,12 +137,18 @@ class authModel {
         [user.user_id]
       );
       if (!userFound) return res.status(401).json({ messagee: "Unauthorized" });
-
+      const [profile] = await conn.query(
+        "select * from profiles where user_id = ?",
+        [user.user_id]
+      );
       return res.json({
         user_id: userFound[0].user_id,
         email: userFound[0].email,
         user: userFound[0].user,
         createdAt: userFound[0].created_at,
+        photo: profile[0].foto,
+        banner: profile[0].banner,
+        biography: profile[0].biography
       });
     });
   }

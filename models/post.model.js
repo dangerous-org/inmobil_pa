@@ -16,6 +16,10 @@ class PostModel {
           "select * from pictures where post_id = ?",
           [posts[0][i].post_id]
         );
+        const [profile] = await conn.query(
+          "select foto, banner, biography from profiles where user_id = ?",
+          [posts[0][i].user_id]
+        );
         posts[0][i].pictures = pics;
       }
       const gotPosts = posts[0];
@@ -90,16 +94,15 @@ class PostModel {
       const post_id = v4();
 
       const { user_id } = req.user;
-
-      // console.log(req.files);
       await conn.query(
         "insert into posts(post_id,description,location,price,type,user_id) values(?,?,?,?,?,?)",
         [post_id, description, location, price, type, user_id]
       ); // Realiza la insercion en la tabla posts
-      const { files } = req.files;
-      if (Array.isArray(files)) {
-        for (const file of files) {
-          const { tempFilePath } = file;
+
+      const { pictures } = req.files;
+      if (Array.isArray(pictures)) {
+        for (const picture of pictures) {
+          const { tempFilePath } = picture;
           const { secure_url, public_id } = await uploadPicture(tempFilePath);
           await conn.query(
             `insert into pictures set 
@@ -115,7 +118,7 @@ class PostModel {
           message: "Post has been created sucessfully",
         });
       }
-      const { tempFilePath } = files;
+      const { tempFilePath } = pictures;
       const { secure_url, public_id } = await uploadPicture(tempFilePath);
       await conn.query(
         `insert into pictures set 
