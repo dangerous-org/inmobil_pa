@@ -17,7 +17,7 @@ const postRouter = Router();
 postRouter.post(
   "/create-post",
   validateAuth,
-  // validateSchema(postSchema)
+  validateSchema(postSchema),
   createPost
 ); // crear post
 
