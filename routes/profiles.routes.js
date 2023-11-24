@@ -2,9 +2,11 @@ import { Router } from "express";
 import validateSchema from "../middleware/validate.schema.js";
 import profileSchema from "../schemas/profile.schema.js";
 import validateAuth from "../middleware/validate.auth.js";
-import { createProfile, putBanner, putBiography, putPhoto, updateProfile } from "../controllers/profile.controller.js";
+import { createProfile, putBanner, putBiography, putPhoto, updateProfile, getProfile } from "../controllers/profile.controller.js";
 
 const profileRouter = Router();
+
+profileRouter.get("/get-profile/:user_id", getProfile);
 
 profileRouter.post('/create-profile',
 validateAuth,

@@ -17,4 +17,8 @@ alter Table posts
 rename column precio to price;
 
 
-desc estate;
+select * from estate;
+
+
+
+select *from posts;
