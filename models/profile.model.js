@@ -8,7 +8,7 @@ class ProfileModel {
   static async createProfile(req = request, res = response) {
     try {
       const { user_id } = req.user;
-      const { biography} = req.body;
+      const { biography } = req.body;
       const [profileFind] = await conn.query(
         "Select * from profiles where user_id = ?",
         [user_id]
@@ -118,6 +118,18 @@ class ProfileModel {
       });
     }
   }
+
+  static async getProfile(req = request, res = response) {
+    try {
+      const { user_id } = req.params;
+      const [userProfile] = await conn.query("call getProfile(?)", [user_id]);
+      return res.status(200).json({ profile: userProfile[0] });
+    } catch (error) {
+      console.log(error, "=> get profile");
+      return res.status(500).json({ message: "profile could not be found" });
+    }
+  }
+
   static async followUser(req = request, res = response) {}
 }
 
