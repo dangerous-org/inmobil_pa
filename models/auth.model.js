@@ -33,6 +33,18 @@ class authModel {
         "insert into users (user_id,user,password,email) values(?,?,?,?);",
         [user_id, user, passwordCrypted, email]
       );
+
+      // crear su perfil de usuario
+      const [profileCreated] = await conn.query(
+        "insert into profiles (user_id, biography) values (?,?)",
+        [user_id, ""]
+      );
+      // buscar su perfil de usuario
+      const [profile] = await conn.query(
+        "select * from profiles where user_id = ?",
+        [user_id]
+      );
+
       // si la peticion se cumple correctamente retorna un codigo de estado 200
       return res
         .status(201)
@@ -81,7 +93,7 @@ class authModel {
         email: userFound[0].email,
         photo: profile[0].foto,
         banner: profile[0].banner,
-        biography: profile[0].biography
+        biography: profile[0].biography,
       });
     } catch (error) {
       console.log(error, "sign in");
@@ -100,6 +112,11 @@ class authModel {
       );
 
       if (userFound && userFound.length > 0) {
+        const [profile] = await conn.query(
+          "select * from profiles where user_id = ?",
+          [userFound[0].user_id]
+        );
+        console.log(profile);
         const user_id = userFound[0].user_id;
         const token = await generateJWT({ user_id });
         res.cookie("authToken", token);
@@ -107,20 +124,40 @@ class authModel {
           user_id: userFound[0].user_id,
           user: userFound[0].user,
           email: userFound[0].email,
+          photo: profile[0].foto,
+          banner: profile[0].banner,
+          biography: profile[0].biography,
         });
       }
 
       const user_id = v4();
+      // crear usuario
       const userCreated = await conn.query(
         "insert into users (user_id, user, email, google_state) values(?,?,?,?)",
         [user_id, nbf, email, true]
       );
+      // crear su perfil de usuario
+      const [profileCreated] = await conn.query(
+        "insert into profiles (user_id, biography) values (?,?)",
+        [user_id, ""]
+      );
+      // buscar su perfil de usuario
+      const [profile] = await conn.query(
+        "select * from profiles where user_id = ?",
+        [user_id]
+      );
 
+      // envio de datos al frontend
       const token = await generateJWT({ user_id });
       res.cookie("authToken", token);
-      return res
-        .status(201)
-        .json({ user_id: user_id, user: nbf, email: email });
+      return res.status(201).json({
+        user_id: user_id,
+        user: nbf,
+        email: email,
+        photo: profile[0].foto,
+        banner: profile[0].banner,
+        biography: profile[0].biography,
+      });
     } catch (error) {
       console.log(error);
       return res.status(500).json({ message: "google auth could not be done" });
@@ -148,7 +185,7 @@ class authModel {
         createdAt: userFound[0].created_at,
         photo: profile[0].foto,
         banner: profile[0].banner,
-        biography: profile[0].biography
+        biography: profile[0].biography,
       });
     });
   }

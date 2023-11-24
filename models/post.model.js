@@ -37,6 +37,7 @@ class PostModel {
   static async getPost(req = request, res = response) {
     try {
       const { post_id } = req.params;
+      // console.log(post_id);
       if (!post_id) {
         return res.status(400).json({
           message: "post_id is required",
@@ -49,6 +50,13 @@ class PostModel {
           message: `This post isn't exist`,
         });
       }
+
+      const [pics] = await conn.query(
+        "select * from pictures where post_id = ?",
+        [post_id]
+      );
+
+      post[0][0].pictures = pics;
 
       return res.status(200).json({
         post: post[0][0],
